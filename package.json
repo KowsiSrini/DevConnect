@@ -1,0 +1,19 @@
+{
+  "name": "devconnect",
+  "version": "1.0.0",
+  "description": "A Platform to connect developers",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon ./src/app.js"
+  },
+  "keywords": [
+    "nodejs",
+    "javascript",
+    "backend"
+  ],
+  "author": "Kowsalya Srinvasan",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
