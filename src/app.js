@@ -1,15 +1,7 @@
 const express = require("express");
 const app = express();
-
-app.use("/admin", (req, res, next) => {
-  const token = "xyzmmmm";
-  const isAuth = token === "xyz";
-  if (!isAuth) {
-    res.status(401).send("not an admin request");
-  } else {
-    next();
-  }
-});
+const { adminauth } = require("./middlewares/auth");
+app.use("/admin", adminauth);
 
 app.get("/admin/getData", (req, res) => {
   res.send("Sent all data");
