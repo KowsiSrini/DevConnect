@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { adminauth } = require("./middlewares/auth");
+const { adminauth, userAuth } = require("./middlewares/auth");
 app.use("/admin", adminauth);
 
 app.get("/admin/getData", (req, res) => {
@@ -9,6 +9,10 @@ app.get("/admin/getData", (req, res) => {
 
 app.delete("/admin/deletedata", (req, res) => {
   res.send("data deleted succesfully");
+});
+
+app.get("/user", userAuth, (req, res) => {
+  res.send("user data sent");
 });
 
 app.listen(3000, () => {
