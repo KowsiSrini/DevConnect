@@ -1,18 +1,23 @@
 const express = require("express");
 const app = express();
-// route handler can be wrapped in array
-//app.use("/user",[h1,h2,h3,h4,h5])
-// app.use("/user",[h1,h2],h3,h4,h5)
-app.use(
-  "/user",
-  (req, res, next) => {
-    res.send("user 1");
+
+app.use("/admin", (req, res, next) => {
+  const token = "xyzmmmm";
+  const isAuth = token === "xyz";
+  if (!isAuth) {
+    res.status(401).send("not an admin request");
+  } else {
     next();
-  },
-  (req, res) => {
-    res.send("user 2");
   }
-);
+});
+
+app.get("/admin/getData", (req, res) => {
+  res.send("Sent all data");
+});
+
+app.delete("/admin/deletedata", (req, res) => {
+  res.send("data deleted succesfully");
+});
 
 app.listen(3000, () => {
   console.log("Server is successfully listening on port 4000");
