@@ -4,11 +4,13 @@ const app = express();
 const connectDB = require("./config/database");
 const User = require("./models/user");
 app.use(express.json());
+const { validateSignupData } = require("./utils/validator.js");
 app.post("/signup", async (req, res) => {
   console.log(req.body);
 
   const userObj = new User(req.body);
   try {
+    validateSignupData(req);
     await userObj.save();
     res.send("user added successfully");
   } catch (err) {

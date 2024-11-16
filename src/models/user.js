@@ -15,10 +15,6 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
       lowercase: true,
-      validate(value) {
-        if (!validator.isEmail(value))
-          throw new Error("Incorrect Email format");
-      },
     },
     password: {
       type: String,
@@ -44,7 +40,7 @@ const userSchema = new mongoose.Schema(
     },
     photo: {
       type: String,
-      default: "photourl",
+
       validate(value) {
         if (!validator.isURL(value)) throw new Error("Invalid URL");
       },
