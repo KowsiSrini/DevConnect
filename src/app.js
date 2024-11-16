@@ -3,9 +3,13 @@ require("./config/database");
 const app = express();
 const connectDB = require("./config/database");
 const User = require("./models/user");
-app.use(express.json());
 const { validateSignupData } = require("./utils/validator.js");
 const bcrypt = require("bcrypt");
+const cookieparser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+app.use(express.json());
+app.use(cookieparser());
+
 app.post("/signup", async (req, res) => {
   try {
     const { firstName, lastName, emailId, password } = req.body;
@@ -35,12 +39,36 @@ app.post("/login", async (req, res) => {
     }
     const passwordValidate = await bcrypt.compare(password, user.password);
     if (passwordValidate) {
+      const token = jwt.sign({ _id: user._id }, "DevConnect");
+
+      res.cookie("token", token);
       res.send("Login Successfull !!");
     } else {
       throw new Error("Login failed!!");
     }
   } catch (error) {
     res.status(400).send("Login Error " + error.message);
+  }
+});
+
+app.get("/profile", async (req, res) => {
+  try {
+    const cookie = req.cookies;
+    const { token } = cookie;
+    if (!token) {
+      throw new Error("Token is invalid");
+    }
+    const validateCookie = jwt.verify(token, "DevConnect");
+    // console.log(validateCookie);
+    const user = await User.findOne({ _id: validateCookie._id });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    // console.log(user);
+
+    res.send(user);
+  } catch (error) {
+    res.status(400).send("Profile Error " + error.message);
   }
 });
 
