@@ -5,16 +5,42 @@ const connectDB = require("./config/database");
 const User = require("./models/user");
 app.use(express.json());
 const { validateSignupData } = require("./utils/validator.js");
+const bcrypt = require("bcrypt");
 app.post("/signup", async (req, res) => {
-  console.log(req.body);
-
-  const userObj = new User(req.body);
   try {
+    const { firstName, lastName, emailId, password } = req.body;
     validateSignupData(req);
+    const passwordHash = await bcrypt.hash(password, 10);
+    const userObj = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
+
     await userObj.save();
     res.send("user added successfully");
   } catch (err) {
     res.status(400).send("Error saving the user " + err.message);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    const user = await User.findOne({ emailId: emailId });
+
+    if (!user) {
+      throw new Error("Login failed!!");
+    }
+    const passwordValidate = await bcrypt.compare(password, user.password);
+    if (passwordValidate) {
+      res.send("Login Successfull !!");
+    } else {
+      throw new Error("Login failed!!");
+    }
+  } catch (error) {
+    res.status(400).send("Login Error " + error.message);
   }
 });
 
