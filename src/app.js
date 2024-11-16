@@ -12,7 +12,7 @@ app.post("/signup", async (req, res) => {
     await userObj.save();
     res.send("user added successfully");
   } catch (err) {
-    res.status(400).send("Error saving the user ", err.message);
+    res.status(400).send("Error saving the user " + err.message);
   }
 });
 
@@ -53,11 +53,13 @@ app.patch("/user", async (req, res) => {
   try {
     const userId = req.body.userID;
     const data = req.body;
-    const user = await User.findByIdAndUpdate(userId, data);
+    const user = await User.findByIdAndUpdate(userId, data, {
+      runValidators: true,
+    });
     console.log(user);
     res.send("User Updated");
   } catch (error) {
-    res.status(400).send("Something went wrong");
+    res.status(400).send("Something went wrong " + error.message);
   }
 });
 connectDB()
