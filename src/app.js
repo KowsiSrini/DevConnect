@@ -38,12 +38,10 @@ app.post("/login", async (req, res) => {
     if (!user) {
       throw new Error("Login failed!!");
     }
-    const passwordValidate = await bcrypt.compare(password, user.password);
-    if (passwordValidate) {
-      const token = jwt.sign({ _id: user._id }, "DevConnect", {
-        expiresIn: "1d",
-      });
+    const passwordValidate = await user.getPasswordValid(password);
 
+    if (passwordValidate) {
+      const token = await user.getJwt();
       res.cookie("token", token, {
         expires: new Date(Date.now() + 1 * 3600000),
       });
