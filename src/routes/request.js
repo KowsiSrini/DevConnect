@@ -2,7 +2,7 @@ const express = require("express");
 const requestRouter = express.Router();
 const { userAuth } = require("../middlewares/auth.js");
 const ConnectionReq = require("../models/connectionReq.js");
-
+const User = require("../models/user.js");
 requestRouter.post(
   "/request/send/:status/:userId",
   userAuth,
@@ -15,6 +15,10 @@ requestRouter.post(
       const allowedStatuses = ["ignored", "interested"];
       if (!allowedStatuses.includes(status)) {
         return res.status(400).send({ message: `Invalid Status: ${status}` });
+      }
+      const userExists = await User.findById(toUserId);
+      if (!userExists) {
+        return res.status(400).send({ message: "User not found" });
       }
       const existsConnection = await ConnectionReq.findOne({
         $or: [
