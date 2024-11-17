@@ -50,6 +50,7 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+userSchema.index({ firstName: 1, lastName: 1 });
 userSchema.methods.getJwt = async function () {
   const user = this;
   const token = await jwt.sign({ _id: user._id }, "DevConnect", {
@@ -63,5 +64,6 @@ userSchema.methods.getPasswordValid = async function (password) {
   const isPasswordValid = await bcrypt.compare(password, user.password);
   return isPasswordValid;
 };
+
 const User = mongoose.model("user", userSchema);
 module.exports = User;
