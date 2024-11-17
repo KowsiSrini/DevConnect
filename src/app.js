@@ -40,9 +40,13 @@ app.post("/login", async (req, res) => {
     }
     const passwordValidate = await bcrypt.compare(password, user.password);
     if (passwordValidate) {
-      const token = jwt.sign({ _id: user._id }, "DevConnect");
+      const token = jwt.sign({ _id: user._id }, "DevConnect", {
+        expiresIn: "1d",
+      });
 
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 1 * 3600000),
+      });
       res.send("Login Successfull !!");
     } else {
       throw new Error("Login failed!!");
@@ -62,75 +66,11 @@ app.get("/profile", userAuth, async (req, res) => {
   }
 });
 
-app.get("/user", async (req, res) => {
-  try {
-    const userEmail = req.body.emailId;
-    const user = await User.find({ emailId: userEmail });
-    if (user.length === 0) {
-      res.status(400).send("User not Found");
-    } else {
-      res.send(user);
-    }
-  } catch (error) {
-    res.status(400).send("Something went wrong");
-  }
+app.post("/sendconnectionreq", userAuth, async (req, res) => {
+  const user = req.user;
+  res.send(user.firstName + " sent connection request");
 });
 
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (error) {
-    res.status(400).send("Something went wrong");
-  }
-});
-
-app.delete("/user", async (req, res) => {
-  try {
-    const userId = req.body.userid;
-    const user = await User.findByIdAndDelete(userId);
-    res.send("User deleted successfully");
-  } catch (error) {
-    res.status(400).send("Something went wrong");
-  }
-});
-
-app.patch("/user/:userID", async (req, res) => {
-  try {
-    const data = req.body;
-    const ALLOWED_UPDATES = [
-      "userID",
-      "lastName",
-      "age",
-      "gender",
-      "about",
-      "skill",
-      "photo",
-    ];
-    const allowUpdate = Object.keys(data).every((k) =>
-      ALLOWED_UPDATES.includes(k)
-    );
-    console.log({ allowUpdate });
-
-    if (!allowUpdate) {
-      throw new Error("Update not allowed");
-    }
-
-    if (data.skill.length > 20) {
-      throw new Error("Skill set length exceeds");
-    }
-
-    const userId = req.params?.userID;
-
-    const user = await User.findByIdAndUpdate(userId, data, {
-      runValidators: true,
-    });
-    console.log(user);
-    res.send("User Updated");
-  } catch (error) {
-    res.status(400).send("Something went wrong " + error.message);
-  }
-});
 connectDB()
   .then(() => {
     console.log("DB connected successfully");
