@@ -7,6 +7,7 @@ const { validateSignupData } = require("./utils/validator.js");
 const bcrypt = require("bcrypt");
 const cookieparser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth.js");
 app.use(express.json());
 app.use(cookieparser());
 
@@ -51,20 +52,9 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookie = req.cookies;
-    const { token } = cookie;
-    if (!token) {
-      throw new Error("Token is invalid");
-    }
-    const validateCookie = jwt.verify(token, "DevConnect");
-    // console.log(validateCookie);
-    const user = await User.findOne({ _id: validateCookie._id });
-    if (!user) {
-      throw new Error("User not found");
-    }
-    // console.log(user);
+    const user = req.user;
 
     res.send(user);
   } catch (error) {
