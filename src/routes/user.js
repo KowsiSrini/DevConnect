@@ -9,7 +9,7 @@ userRouter.get("/user/requests/pending", userAuth, async (req, res) => {
     const pendingRequests = await ConnectionReqModel.find({
       toUserId: loggedInUser._id,
       status: "interested",
-    });
+    }).populate("fromUserId", ["firstName", "lastName"]);
     res.json({ message: "Data fetched succesfully", pendingRequests });
   } catch (error) {
     res.status(400).send("Error: " + error.message);
