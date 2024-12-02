@@ -25,6 +25,7 @@ authRouter.post("/signup", async (req, res) => {
 authRouter.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
+
     const user = await User.findOne({ emailId: emailId });
 
     if (!user) {
@@ -37,7 +38,7 @@ authRouter.post("/login", async (req, res) => {
       res.cookie("token", token, {
         expires: new Date(Date.now() + 1 * 3600000),
       });
-      res.send("Login Successfull !!");
+      res.send(user);
     } else {
       throw new Error("Login failed!!");
     }
